@@ -21,7 +21,7 @@
       nav > div:first-of-type { flex-shrink: 0 !important; }
       /* 汉堡按钮（JS 注入） */
       #gt-mobile-btn { display: flex !important; align-items: center; justify-content: center; width: 38px; height: 38px; background: none; border: none; cursor: pointer; padding: 0; position: relative; }
-      #gt-mobile-btn span { display: block; width: 20px; height: 2px; background: #fff; margin: 2.5px 0; transition: transform .3s, opacity .3s; }
+      #gt-mobile-btn span { display: block; width: 20px; height: 2px; background: #fff; margin: 2.5px 0; flex-shrink: 0; }
       #gt-mobile-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
       #gt-mobile-btn.open span:nth-child(2) { opacity: 0; }
       #gt-mobile-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
