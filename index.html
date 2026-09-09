@@ -147,6 +147,7 @@
           }
           el.dataset.gtT = '1';
           if (el.id === 'gt-mobile-menu' || el.id === 'gt-mobile-btn') return;
+          if (el.closest && el.closest('[data-gt-own]')) return; /* V3 自有模块自带配色，不参与映射 */
           if (heroEl && heroEl.contains(el)) return;
           var inF = !!(el.closest && el.closest('footer'));
           var cs;
@@ -251,6 +252,407 @@
         var els = document.querySelectorAll('[style*="191, 255" i], [style*="#00bfff" i]');
         for (var i = 0; i < els.length; i++) retheme(els[i]);
       }, 600);
+    })();
+    </script>
+    <style id="gt-v3">
+    /* ========== V3：场景轮播 + 电商布局 + 会员体系（自有配色，data-gt-own 隔离） ========== */
+    [data-gt-own], [data-gt-own] * { box-sizing: border-box; }
+
+    /* ---- 场景轮播 ---- */
+    .gt-scene { padding: 64px 60px 56px; background: linear-gradient(180deg, #FAF7F1 0%, #F1EAE0 100%); }
+    .gt-scene-head { max-width: 1280px; margin: 0 auto 26px; }
+    .gt-scene-kicker { font-size: 12px; letter-spacing: .35em; color: #B5652F; font-weight: 600; }
+    .gt-scene-title { font-size: clamp(24px, 3vw, 32px); color: #2E2A25; font-weight: 700; margin: 10px 0 6px; }
+    .gt-scene-sub { font-size: 14px; color: rgba(46,42,37,.6); }
+    .gt-scene-sub b { color: #B5652F; font-weight: 600; }
+    .gt-car { position: relative; max-width: 1280px; margin: 0 auto; border-radius: 20px; overflow: hidden;
+      height: clamp(300px, 40vw, 470px); box-shadow: 0 18px 44px rgba(46,42,37,.14); }
+    .gt-slide { position: absolute; inset: 0; opacity: 0; transition: opacity .9s ease; background-size: cover; background-position: center; cursor: pointer; }
+    .gt-slide.on { opacity: 1; }
+    .gt-slide::before { content: ""; position: absolute; inset: 0;
+      background: linear-gradient(78deg, rgba(30,24,18,.72) 0%, rgba(30,24,18,.34) 46%, rgba(30,24,18,0) 72%); }
+    .gt-cap { position: absolute; left: clamp(20px, 4.5vw, 56px); bottom: clamp(22px, 4.5vw, 52px); z-index: 2; max-width: min(560px, 78%); color: #F5EFE6; }
+    .gt-cap-k { font-size: 12px; letter-spacing: .3em; color: #E8A06B; font-weight: 600; margin-bottom: 8px; }
+    .gt-cap-t { font-size: clamp(19px, 2.6vw, 30px); font-weight: 700; line-height: 1.35; margin: 0 0 6px; }
+    .gt-cap-d { font-size: clamp(12px, 1.3vw, 14px); color: rgba(245,239,230,.85); line-height: 1.7; }
+    .gt-cta { display: inline-block; margin-top: 14px; padding: 9px 24px; border: 1px solid rgba(245,239,230,.6); border-radius: 999px;
+      color: #F5EFE6; font-size: 13px; letter-spacing: .12em; text-decoration: none; transition: all .25s; }
+    .gt-cta:hover { background: #C2703E; border-color: #C2703E; }
+    .gt-arr { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 42px; border-radius: 50%;
+      border: none; background: rgba(30,24,18,.38); color: #F5EFE6; font-size: 18px; cursor: pointer; z-index: 3; transition: background .25s; }
+    .gt-arr:hover { background: #C2703E; }
+    .gt-arr.prev { left: 14px; } .gt-arr.next { right: 14px; }
+    .gt-dots { position: absolute; right: 20px; bottom: 18px; z-index: 3; display: flex; gap: 7px; }
+    .gt-dots span { width: 8px; height: 8px; border-radius: 999px; background: rgba(245,239,230,.45); cursor: pointer; transition: all .3s; }
+    .gt-dots span.on { width: 24px; background: #E08D57; }
+
+    /* ---- 电商工具条 ---- */
+    .gt-shopbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin: 0 0 26px; }
+    .gt-tabs { display: flex; gap: 10px; flex-wrap: wrap; }
+    .gt-tab { padding: 9px 20px; border-radius: 999px; border: 1px solid rgba(46,42,37,.16); background: transparent;
+      color: rgba(46,42,37,.72); font-size: 14px; cursor: pointer; transition: all .22s; white-space: nowrap; }
+    .gt-tab:hover { border-color: #C2703E; color: #B5652F; }
+    .gt-tab.on { background: #C2703E; border-color: #C2703E; color: #fff; box-shadow: 0 4px 14px rgba(194,112,62,.3); }
+    .gt-tab .n { font-size: 12px; opacity: .65; margin-left: 4px; }
+    .gt-count { font-size: 13px; color: rgba(46,42,37,.5); }
+    /* 加购按钮 */
+    .gt-add { display: block; width: 100%; margin-top: 12px; padding: 10px 0; border: none; border-radius: 10px;
+      background: #C2703E; color: #fff; font-size: 13px; letter-spacing: .1em; cursor: pointer; transition: background .22s; }
+    .gt-add:hover { background: #B5652F; }
+
+    /* ---- 浮动购物车 + 抽屉 ---- */
+    .gt-cartfab { position: fixed; right: 18px; bottom: 92px; width: 56px; height: 56px; border-radius: 50%; border: none;
+      background: #C2703E; color: #fff; cursor: pointer; z-index: 95; display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 10px 28px rgba(194,112,62,.45); transition: transform .22s; }
+    .gt-cartfab:hover { transform: scale(1.06); }
+    .gt-badge { position: absolute; top: -4px; right: -4px; min-width: 21px; height: 21px; border-radius: 999px; background: #2E2A25;
+      color: #fff; font-size: 11px; font-weight: 600; display: flex; align-items: center; justify-content: center; padding: 0 5px; }
+    .gt-mask { position: fixed; inset: 0; background: rgba(46,42,37,.4); z-index: 118; opacity: 0; pointer-events: none; transition: opacity .3s; }
+    .gt-mask.open { opacity: 1; pointer-events: auto; }
+    .gt-drawer { position: fixed; top: 0; right: 0; bottom: 0; width: min(370px, 94vw); background: #FAF7F1; z-index: 120;
+      transform: translateX(106%); transition: transform .35s cubic-bezier(.22,.8,.3,1); display: flex; flex-direction: column;
+      box-shadow: -10px 0 36px rgba(46,42,37,.2); }
+    .gt-drawer.open { transform: translateX(0); }
+    .gt-drawer-h { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px; border-bottom: 1px solid rgba(46,42,37,.08); }
+    .gt-drawer-h b { font-size: 16px; color: #2E2A25; }
+    .gt-drawer-x { border: none; background: none; font-size: 22px; color: rgba(46,42,37,.5); cursor: pointer; line-height: 1; }
+    .gt-drawer-list { flex: 1; overflow-y: auto; padding: 8px 20px; }
+    .gt-ci { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px dashed rgba(46,42,37,.1); }
+    .gt-ci-info { flex: 1; min-width: 0; }
+    .gt-ci-name { font-size: 13.5px; color: #2E2A25; margin-bottom: 3px; }
+    .gt-ci-price { font-size: 13.5px; color: #B5652F; font-weight: 700; }
+    .gt-qty { display: flex; align-items: center; gap: 8px; }
+    .gt-qty button { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(46,42,37,.22); background: #fff;
+      color: #2E2A25; font-size: 14px; line-height: 1; cursor: pointer; }
+    .gt-qty button:hover { border-color: #C2703E; color: #B5652F; }
+    .gt-qty i { font-style: normal; font-size: 13px; color: #2E2A25; min-width: 16px; text-align: center; }
+    .gt-del { border: none; background: none; font-size: 12px; color: rgba(46,42,37,.4); cursor: pointer; }
+    .gt-del:hover { color: #B5652F; }
+    .gt-empty { text-align: center; color: rgba(46,42,37,.45); font-size: 13px; padding: 46px 0; }
+    .gt-drawer-f { padding: 16px 20px 20px; border-top: 1px solid rgba(46,42,37,.08); }
+    .gt-total { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 12px; font-size: 13px; color: rgba(46,42,37,.6); }
+    .gt-total b { font-size: 21px; color: #B5652F; }
+    .gt-checkout { display: block; width: 100%; padding: 13px 0; border: none; border-radius: 999px; background: #C2703E;
+      color: #fff; font-size: 14px; letter-spacing: .14em; cursor: pointer; transition: background .22s; }
+    .gt-checkout:hover { background: #B5652F; }
+    .gt-drawer-note { margin-top: 9px; text-align: center; font-size: 11px; color: rgba(46,42,37,.42); }
+
+    /* ---- 会员体系 ---- */
+    .gt-member { width: 100%; max-width: 1120px; margin: 64px auto 0; }
+    .gt-mem-head { text-align: center; margin-bottom: 30px; }
+    .gt-mem-kicker { font-size: 12px; letter-spacing: .35em; color: #B5652F; font-weight: 600; }
+    .gt-mem-title { font-size: clamp(22px, 2.6vw, 30px); color: #2E2A25; font-weight: 700; margin: 10px 0 8px; }
+    .gt-mem-sub { font-size: 14px; color: rgba(46,42,37,.6); line-height: 1.8; }
+    .gt-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .gt-tier { position: relative; background: #fff; border-radius: 18px; padding: 30px 26px 26px; border: 1px solid rgba(46,42,37,.08);
+      box-shadow: 0 12px 32px rgba(46,42,37,.07); display: flex; flex-direction: column; }
+    .gt-tier.hot { border: 1.5px solid #C2703E; box-shadow: 0 16px 40px rgba(194,112,62,.16); }
+    .gt-hot-tag { position: absolute; top: -11px; right: 20px; background: #C2703E; color: #fff; font-size: 11px;
+      letter-spacing: .12em; padding: 4px 12px; border-radius: 999px; }
+    .gt-tier-name { font-size: 17px; font-weight: 700; color: #2E2A25; }
+    .gt-tier-desc { font-size: 12px; color: rgba(46,42,37,.5); margin: 4px 0 14px; }
+    .gt-tier-price { margin-bottom: 16px; }
+    .gt-tier-price b { font-size: 27px; color: #B5652F; font-weight: 700; }
+    .gt-tier-price span { font-size: 12px; color: rgba(46,42,37,.5); margin-left: 4px; }
+    .gt-tier ul { list-style: none; padding: 0; margin: 0 0 18px; flex: 1; }
+    .gt-tier li { font-size: 13px; color: rgba(46,42,37,.75); line-height: 2.1; padding-left: 20px; position: relative; }
+    .gt-tier li::before { content: "✓"; position: absolute; left: 0; color: #C2703E; font-weight: 700; }
+    .gt-join { width: 100%; padding: 11px 0; border-radius: 999px; font-size: 13.5px; letter-spacing: .12em; cursor: pointer; transition: all .22s;
+      border: 1px solid #C2703E; background: transparent; color: #B5652F; }
+    .gt-join:hover { background: rgba(194,112,62,.08); }
+    .gt-tier.hot .gt-join { background: #C2703E; color: #fff; }
+    .gt-tier.hot .gt-join:hover { background: #B5652F; }
+    .gt-membered { text-align: center; font-size: 13px; color: rgba(46,42,37,.55); margin-top: 18px; }
+    .gt-membered b { color: #B5652F; }
+
+    /* ---- 加入会员弹窗 + Toast ---- */
+    .gt-modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -46%) scale(.96); width: min(360px, 92vw);
+      background: #FAF7F1; border-radius: 18px; z-index: 125; padding: 26px 24px; opacity: 0; pointer-events: none;
+      transition: all .3s; box-shadow: 0 24px 60px rgba(46,42,37,.3); }
+    .gt-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%, -50%) scale(1); }
+    .gt-modal h4 { margin: 0 0 4px; font-size: 18px; color: #2E2A25; }
+    .gt-modal p { margin: 0 0 16px; font-size: 12.5px; color: rgba(46,42,37,.55); }
+    .gt-modal input { width: 100%; padding: 12px 14px; border: 1px solid rgba(46,42,37,.18); border-radius: 10px;
+      font-size: 14px; margin-bottom: 10px; background: #fff; color: #2E2A25; }
+    .gt-modal input:focus { outline: none; border-color: #C2703E; }
+    .gt-modal .gt-join-submit { width: 100%; padding: 12px 0; border: none; border-radius: 999px; background: #C2703E;
+      color: #fff; font-size: 14px; letter-spacing: .12em; cursor: pointer; }
+    .gt-modal .gt-join-submit:hover { background: #B5652F; }
+    .gt-toast { position: fixed; left: 50%; bottom: 158px; transform: translateX(-50%) translateY(8px); background: rgba(46,42,37,.94);
+      color: #F5EFE6; padding: 11px 22px; border-radius: 999px; font-size: 13px; z-index: 130; opacity: 0;
+      pointer-events: none; transition: all .3s; max-width: 86vw; text-align: center; }
+    .gt-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ---- 移动端适配 ---- */
+    @media (max-width: 768px) {
+      .gt-scene { padding: 44px 16px 40px; }
+      .gt-car { height: clamp(240px, 60vw, 330px); border-radius: 16px; }
+      .gt-cap { left: 18px; right: 18px; bottom: 40px; max-width: 88%; }
+      .gt-cap-t { font-size: 19px; }
+      .gt-arr { display: none; }
+      .gt-dots { right: 16px; bottom: 14px; }
+      .gt-shopbar { margin-bottom: 18px; }
+      .gt-tabs { overflow-x: auto; flex-wrap: nowrap; max-width: 100%; padding-bottom: 2px; -webkit-overflow-scrolling: touch; }
+      .gt-tab { padding: 7px 15px; font-size: 13px; }
+      .gt-add { padding: 8px 0; font-size: 12px; }
+      [data-gt-name] button { white-space: nowrap; }
+      .gt-cartfab { width: 50px; height: 50px; right: 14px; bottom: 84px; }
+      .gt-tiers { grid-template-columns: 1fr; gap: 16px; }
+      .gt-member { margin-top: 44px; }
+    }
+    </style>
+    <script id="gt-v3-js">
+    /* ========== V3：场景轮播 + 电商布局 + 会员体系 ========== */
+    (function () {
+      function el(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+      function own(node) { node.setAttribute('data-gt-own', ''); return node; }
+      var toastT = null;
+      function toast(msg) {
+        var t = document.querySelector('.gt-toast');
+        if (!t) { t = own(el('<div class="gt-toast"></div>')); document.body.appendChild(t); }
+        t.textContent = msg; t.classList.add('show');
+        clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 2400);
+      }
+
+      /* ---------- 购物车 ---------- */
+      var cart = [];
+      try { cart = JSON.parse(localStorage.getItem('gt-cart') || '[]'); } catch (e) { cart = []; }
+      function saveCart() { try { localStorage.setItem('gt-cart', JSON.stringify(cart)); } catch (e) {} }
+      function cartTotal() { return cart.reduce(function (s, i) { return s + i.price * i.qty; }, 0); }
+      function cartCount() { return cart.reduce(function (s, i) { return s + i.qty; }, 0); }
+
+      var fab, badge, drawer, mask, listEl, totalEl;
+      function buildCartUI() {
+        fab = own(el('<button class="gt-cartfab" aria-label="购物车"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 7h12l-1.2 12.2a1.5 1.5 0 0 1-1.5 1.3H8.7a1.5 1.5 0 0 1-1.5-1.3L6 7z"/><path d="M9 10V6a3 3 0 0 1 6 0v4"/></svg><span class="gt-badge" style="display:none">0</span></button>'));
+        badge = fab.querySelector('.gt-badge');
+        mask = own(el('<div class="gt-mask"></div>'));
+        drawer = own(el('<div class="gt-drawer"><div class="gt-drawer-h"><b>购物车</b><button class="gt-drawer-x">×</button></div><div class="gt-drawer-list"></div><div class="gt-drawer-f"><div class="gt-total"><span>合计</span><b>¥0</b></div><button class="gt-checkout">立即下单</button><div class="gt-drawer-note">演示模式：正式版将接入微信/支付宝支付</div></div></div>'));
+        listEl = drawer.querySelector('.gt-drawer-list');
+        totalEl = drawer.querySelector('.gt-total b');
+        document.body.appendChild(fab); document.body.appendChild(mask); document.body.appendChild(drawer);
+        function openD(o) { drawer.classList.toggle('open', o); mask.classList.toggle('open', o); }
+        fab.addEventListener('click', function () { renderCart(); openD(true); });
+        drawer.querySelector('.gt-drawer-x').addEventListener('click', function () { openD(false); });
+        mask.addEventListener('click', function () { openD(false); });
+        drawer.querySelector('.gt-checkout').addEventListener('click', function () {
+          if (!cart.length) { toast('购物车还是空的，先去挑一件钛宝贝吧'); return; }
+          toast('订单已提交（演示模式）· 会员顾问将电话联系您确认支付');
+        });
+        updateBadge();
+      }
+      function updateBadge() {
+        var n = cartCount();
+        badge.textContent = n; badge.style.display = n > 0 ? 'flex' : 'none';
+      }
+      function renderCart() {
+        if (!cart.length) { listEl.innerHTML = '<div class="gt-empty">购物车空空如也<br>去商城挑一件纯钛好物吧</div>'; }
+        else {
+          listEl.innerHTML = '';
+          cart.forEach(function (it, idx) {
+            var row = own(el('<div class="gt-ci"><div class="gt-ci-info"><div class="gt-ci-name"></div><div class="gt-ci-price">¥' + (it.price * it.qty).toLocaleString() + '</div></div><div class="gt-qty"><button data-a="-">−</button><i>' + it.qty + '</i><button data-a="+">+</button></div><button class="gt-del">删除</button></div>'));
+            row.querySelector('.gt-ci-name').textContent = it.name;
+            row.querySelector('[data-a="+"]').addEventListener('click', function () { it.qty++; sync(); });
+            row.querySelector('[data-a="-"]').addEventListener('click', function () { it.qty > 1 ? it.qty-- : cart.splice(idx, 1); sync(); });
+            row.querySelector('.gt-del').addEventListener('click', function () { cart.splice(idx, 1); sync(); });
+            listEl.appendChild(row);
+          });
+        }
+        totalEl.textContent = '¥' + cartTotal().toLocaleString();
+        function sync() { saveCart(); renderCart(); updateBadge(); }
+      }
+      function addToCart(name, price) {
+        var hit = cart.find(function (i) { return i.name === name; });
+        hit ? hit.qty++ : cart.push({ name: name, price: price, qty: 1 });
+        saveCart(); updateBadge();
+        toast('已加入购物车：' + name);
+        fab.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 320 });
+      }
+
+      /* ---------- 场景轮播 ---------- */
+      var SLIDES = [
+        { img: './scene-banner-1.jpg', k: '商旅随行 · BUSINESS TRAVEL', t: '一杯好水，伴全程商旅', d: '高铁 · 航班 · 酒店，纯钛 + TDNS 双重活化，把健康装进行李箱', cta: '选购商旅装备', to: '#products' },
+        { img: './scene-banner-2.jpg', k: '自驾畅行 · ROAD TRIP', t: '日出出发，旷野有茶', d: '可明火直烧钛杯 + 800ml 旅行壶，从服务区到营地，随时来一口热的', cta: '看自驾套装', to: '#scenarios' },
+        { img: './scene-banner-3.jpg', k: '旅居茶事 · SLOW LIVING', t: '湖畔安家，一席好茶', d: '旅居茶具套装，民宿长住也能泡出一壶有仪式感的慢生活', cta: '逛旅居茶事', to: '#scenarios' },
+        { img: './scene-banner-4.jpg', k: '尊贵礼赠 · GIFTING', t: '传世钛礼，心意有光', d: '非遗锲金收藏杯 · 定制礼盒，商旅馈赠最体面的选择', cta: '挑一件好礼', to: '#scenarios' }
+      ];
+      function buildCarousel() {
+        var hero = document.getElementById('hero');
+        if (!hero) return false;
+        var sec = own(el('<section class="gt-scene"><div class="gt-scene-head"><div class="gt-scene-kicker">SCENARIOS · 使用场景</div><div class="gt-scene-title">三种旅途，一种品质</div><div class="gt-scene-sub">为<b>商旅通勤</b>、<b>自驾旷野</b>、<b>旅居慢生活</b>而设计 —— 官网品牌馆 · 光体商城 · 会员权益，一站式服务</div></div><div class="gt-car"></div></section>'));
+        var car = sec.querySelector('.gt-car');
+        SLIDES.forEach(function (s, i) {
+          var sl = el('<div class="gt-slide' + (i === 0 ? ' on' : '') + '" style="background-image:url(' + s.img + ')"><div class="gt-cap"><div class="gt-cap-k">' + s.k + '</div><h3 class="gt-cap-t">' + s.t + '</h3><div class="gt-cap-d">' + s.d + '</div><a class="gt-cta" href="' + s.to + '">' + s.cta + '</a></div></div>');
+          car.appendChild(sl);
+        });
+        /* dots */
+        var dotsWrap = own(el('<div class="gt-dots"></div>'));
+        var dots = SLIDES.map(function (_, i) {
+          var d = el('<span' + (i === 0 ? ' class="on"' : '') + '></span>');
+          d.addEventListener('click', function () { go(i); restart(); });
+          dotsWrap.appendChild(d); return d;
+        });
+        car.appendChild(dotsWrap);
+        var prev = own(el('<button class="gt-arr prev" aria-label="上一张">‹</button>'));
+        var next = own(el('<button class="gt-arr next" aria-label="下一张">›</button>'));
+        prev.addEventListener('click', function () { go(cur - 1); restart(); });
+        next.addEventListener('click', function () { go(cur + 1); restart(); });
+        car.appendChild(prev); car.appendChild(next);
+        var cur = 0, timer = null;
+        function go(i) {
+          cur = (i + SLIDES.length) % SLIDES.length;
+          car.querySelectorAll('.gt-slide').forEach(function (s, j) { s.classList.toggle('on', j === cur); });
+          dots.forEach(function (d, j) { d.classList.toggle('on', j === cur); });
+        }
+        function restart() { clearInterval(timer); timer = setInterval(function () { if (!document.hidden) go(cur + 1); }, 4500); }
+        car.addEventListener('mouseenter', function () { clearInterval(timer); });
+        car.addEventListener('mouseleave', restart);
+        var tx = null;
+        car.addEventListener('touchstart', function (e) { tx = e.touches[0].clientX; }, { passive: true });
+        car.addEventListener('touchend', function (e) {
+          if (tx === null) return;
+          var dx = e.changedTouches[0].clientX - tx;
+          if (Math.abs(dx) > 42) { go(cur + (dx < 0 ? 1 : -1)); restart(); }
+          tx = null;
+        }, { passive: true });
+        restart();
+        hero.after(sec);
+        return true;
+      }
+
+      /* ---------- 电商化产品区 ---------- */
+      var CATS = [
+        { id: 'all', label: '全部', re: null },
+        { id: 'cup', label: '钛杯', re: /直杯|绅士杯|蘑菇杯|收藏杯/ },
+        { id: 'tea', label: '茶咖器具', re: /茶壶|茶杯|咖啡/ },
+        { id: 'pot', label: '烹饪锅具', re: /炒锅|汤锅|奶锅|煎锅/ },
+        { id: 'gear', label: '户外装备', re: /旅行壶|焖壶|餐具/ }
+      ];
+      function buildShop() {
+        var sec = document.getElementById('products');
+        if (!sec) return false;
+        /* 找产品网格：#products 内带 grid-template-columns 且子元素含图片的容器（四大系列各一个） */
+        var grids = [].slice.call(sec.querySelectorAll('div')).filter(function (d) {
+          return /grid-template-columns:\s*repeat/.test(d.getAttribute('style') || '') && d.querySelector('img');
+        });
+        if (!grids.length) return false;
+        var cards = [];
+        grids.forEach(function (g) {
+          [].slice.call(g.children).forEach(function (c) {
+            if (c.querySelector('img')) cards.push(c);
+          });
+        });
+        if (!cards.length) return false;
+        cards.forEach(function (card) {
+          var text = card.textContent || '';
+          var pm = text.match(/¥\s*([\d,]+)/);
+          var price = pm ? parseInt(pm[1].replace(/,/g, ''), 10) : 0;
+          var img = card.querySelector('img');
+          var name = (img && img.alt && img.alt.length > 1 && !/光体/.test(img.alt)) ? img.alt : text.split('¥')[0].trim().slice(0, 26);
+          card.dataset.gtName = name; card.dataset.gtPrice = price;
+          /* 接管卡片自带的「加入购物车」按钮；没有才补一个 */
+          var ownBtn = [].slice.call(card.querySelectorAll('button')).find(function (bt) {
+            return !/gt-add/.test(bt.className) && /加入购物车|加入购物/.test(bt.textContent);
+          });
+          var btn = ownBtn || el('<button class="gt-add">加入购物车</button>');
+          if (!ownBtn) card.appendChild(btn);
+          btn.addEventListener('click', function (e) { e.stopPropagation(); addToCart(name, price); });
+        });
+        /* 工具条：插在第一个网格所在系列容器之前 */
+        var bar = own(el('<div class="gt-shopbar"><div class="gt-tabs"></div><div class="gt-count"></div></div>'));
+        var tabsWrap = bar.querySelector('.gt-tabs'), countEl = bar.querySelector('.gt-count');
+        function applyFilter(re) {
+          var total = 0;
+          grids.forEach(function (g) {
+            var vis = 0;
+            [].slice.call(g.children).forEach(function (c) {
+              if (!c.dataset.gtName) return;
+              var ok = !re || re.test(c.dataset.gtName);
+              c.style.display = ok ? '' : 'none';
+              if (ok) vis++;
+            });
+            g.style.display = vis ? '' : 'none';
+            var wrap = g.parentElement;
+            if (wrap && wrap !== sec && wrap.querySelector('img')) wrap.style.display = vis ? '' : 'none';
+            total += vis;
+          });
+          countEl.textContent = '共 ' + total + ' 件商品';
+        }
+        CATS.forEach(function (c) {
+          var n = c.re ? cards.filter(function (cd) { return c.re.test(cd.dataset.gtName); }).length : cards.length;
+          var t = el('<button class="gt-tab' + (c.id === 'all' ? ' on' : '') + '">' + c.label + '<span class="n">' + n + '</span></button>');
+          t.addEventListener('click', function () {
+            tabsWrap.querySelectorAll('.gt-tab').forEach(function (x) { x.classList.remove('on'); });
+            t.classList.add('on');
+            applyFilter(c.re);
+          });
+          tabsWrap.appendChild(t);
+        });
+        countEl.textContent = '共 ' + cards.length + ' 件商品';
+        var firstGrid = grids[0];
+        var anchor = firstGrid.parentElement && firstGrid.parentElement !== sec ? firstGrid.parentElement : firstGrid;
+        anchor.parentNode.insertBefore(bar, anchor);
+        return true;
+      }
+
+      /* ---------- 会员体系 ---------- */
+      var TIERS = [
+        { name: '悦享会员', desc: '免费注册 · 即刻生效', price: '免费', per: '', hot: false,
+          items: ['注册即送 100 积分，积分抵现', '全场会员价，比日常价更省', '生日月专属礼遇与双倍积分', '新品首发优先购买权'] },
+        { name: '商旅黑金', desc: '为高频商旅人群打造', price: '¥365', per: '/ 年', hot: true,
+          items: ['全场 95 折，叠加会员价使用', '每月 1 次免费钛杯深度养护', '免费激光刻字，出差异于识别', '专属会员顾问 · 优先发货', '消费 1 元 = 2 积分，积分抵现'] },
+        { name: '创始典藏', desc: '限量 1000 席 · 编号珍藏', price: '¥2999', per: '/ 年', hot: false,
+          items: ['全场 88 折，全品类通用', '非遗锲金限量款优先认购权', '每年 2 次免费全套餐具养护', '一对一专属定制与礼赠方案', '年度钛艺雅集 · 会员专属邀请'] }
+      ];
+      function buildMember() {
+        var sec = document.getElementById('membership');
+        if (!sec) return false;
+        var wrap = own(el('<div class="gt-member"><div class="gt-mem-head"><div class="gt-mem-kicker">MEMBERSHIP · 会员体系</div><div class="gt-mem-title">官网 · 商城 · 会员，一站式服务</div><div class="gt-mem-sub">一次注册，三大权益贯通：品牌资讯第一时间推送 · 商城全场会员价 · 积分全年通兑<br>选购 → 下单 → 养护 → 升级，全生命周期陪伴</div></div><div class="gt-tiers"></div><div class="gt-membered" style="display:none">欢迎你，<b></b>！会员权益已生效，商城下单即享会员价</div></div>'));
+        var tiers = wrap.querySelector('.gt-tiers');
+        TIERS.forEach(function (t) {
+          var card = el('<div class="gt-tier' + (t.hot ? ' hot' : '') + '">' + (t.hot ? '<span class="gt-hot-tag">最受欢迎</span>' : '') + '<div class="gt-tier-name">' + t.name + '</div><div class="gt-tier-desc">' + t.desc + '</div><div class="gt-tier-price"><b>' + t.price + '</b><span>' + t.per + '</span></div><ul>' + t.items.map(function (i) { return '<li>' + i + '</li>'; }).join('') + '</ul><button class="gt-join">' + (t.hot ? '立即加入' : '选择此档') + '</button></div>');
+          card.querySelector('.gt-join').addEventListener('click', function () { openJoin(t.name); });
+          tiers.appendChild(card);
+        });
+        var membered = wrap.querySelector('.gt-membered');
+        var saved = null;
+        try { saved = JSON.parse(localStorage.getItem('gt-member') || 'null'); } catch (e) {}
+        if (saved) { membered.style.display = ''; membered.querySelector('b').textContent = saved.phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2'); }
+        sec.appendChild(wrap);
+
+        /* 加入弹窗 */
+        var modal = own(el('<div class="gt-modal"><h4>加入光体•智造会员</h4><p>填写手机号即可完成注册，权益即时生效</p><input type="tel" maxlength="11" placeholder="请输入 11 位手机号"><button class="gt-join-submit">确认加入</button></div>'));
+        document.body.appendChild(modal);
+        var currentTier = '悦享会员';
+        function closeModal() { modal.classList.remove('open'); if (mask) mask.classList.remove('open'); }
+        function openJoin(tier) {
+          currentTier = tier;
+          modal.querySelector('h4').textContent = '加入「' + tier + '」';
+          modal.classList.add('open'); if (mask) mask.classList.add('open');
+        }
+        var wireT = setInterval(function () { if (mask) { mask.addEventListener('click', closeModal); clearInterval(wireT); } }, 300);
+        setTimeout(function () { clearInterval(wireT); }, 12000);
+        modal.querySelector('.gt-join-submit').addEventListener('click', function () {
+          var phone = modal.querySelector('input').value.trim();
+          if (!/^1\d{10}$/.test(phone)) { toast('请输入正确的 11 位手机号'); return; }
+          try { localStorage.setItem('gt-member', JSON.stringify({ phone: phone, tier: currentTier, at: Date.now() })); } catch (e) {}
+          modal.classList.remove('open'); mask && mask.classList.remove('open');
+          membered.style.display = '';
+          membered.querySelector('b').textContent = phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2');
+          toast('🎉 欢迎加入「' + currentTier + '」，权益已生效');
+        });
+        return true;
+      }
+
+      /* ---------- 轮询等待 React 渲染完成后初始化 ---------- */
+      var done = { car: false, shop: false, mem: false, cart: false };
+      var poll = setInterval(function () {
+        if (!done.cart && document.querySelector('nav')) { buildCartUI(); done.cart = true; }
+        if (!done.car) done.car = buildCarousel();
+        if (!done.shop) done.shop = buildShop();
+        if (!done.mem) done.mem = buildMember();
+        if (done.car && done.shop && done.mem && done.cart) clearInterval(poll);
+      }, 400);
+      setTimeout(function () { clearInterval(poll); }, 25000);
     })();
     </script>
   </body></html>
