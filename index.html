@@ -25,11 +25,11 @@
       #gt-mobile-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
       #gt-mobile-btn.open span:nth-child(2) { opacity: 0; }
       #gt-mobile-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-      /* 全屏抽屉菜单 */
-      #gt-mobile-menu { position: fixed; top: 58px; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,.96); backdrop-filter: blur(12px); z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; pointer-events: none; transition: opacity .3s; }
+      /* 全屏抽屉菜单（暖色调） */
+      #gt-mobile-menu { position: fixed; top: 58px; left: 0; right: 0; bottom: 0; background: rgba(250,247,241,.98); backdrop-filter: blur(12px); z-index: 99; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; opacity: 0; pointer-events: none; transition: opacity .3s; }
       #gt-mobile-menu.open { opacity: 1; pointer-events: auto; }
-      #gt-mobile-menu a { color: rgba(255,255,255,.85); font-size: 20px; font-weight: 500; text-decoration: none; padding: 12px 24px; letter-spacing: .1em; }
-      #gt-mobile-menu a:active { color: #00bfff; }
+      #gt-mobile-menu a { color: #2e2a25; font-size: 20px; font-weight: 500; text-decoration: none; padding: 12px 24px; letter-spacing: .1em; }
+      #gt-mobile-menu a:active { color: #b5652f; }
       /* 板块内边距写死 140px 60px → 小屏收紧 */
       section[style*="padding: 140px 60px"] { padding: 72px 18px !important; }
       /* 网格自适应：4列→2列，3列→2列，2列→1列 */
@@ -102,6 +102,155 @@
         if (document.querySelector('nav')) { clearInterval(timer); boot(); }
       }, 200);
       setTimeout(function () { clearInterval(timer); }, 15000);
+    })();
+    </script>
+    <style id="gt-ui2">
+    /* ========== 光体•智造 UI v2「日出暖调」重设计层 ========== */
+    :root { --paper:#FAF7F1; --sand:#F1EAE0; --ink:#2E2A25; --accent:#C2703E; --accent-deep:#B5652F; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--paper) !important; }
+    ::selection { background: rgba(194,112,62,.25); }
+    /* 手机端抽屉菜单在桌面端必须隐藏（其样式只存在于移动端媒体查询内） */
+    @media (min-width: 769px) { #gt-mobile-menu { display: none; } }
+    /* Hero 保留暗色电影感，底部接日出暖光过渡到亮色商城区 */
+    #hero::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:36%; z-index:5; pointer-events:none;
+      background:linear-gradient(to bottom, rgba(250,247,241,0) 0%, rgba(224,141,87,.16) 48%, rgba(250,247,241,.97) 100%); }
+    /* 顶栏：暖奶油玻璃 */
+    [data-gt-nav] { background:rgba(250,247,241,.92) !important; backdrop-filter:blur(14px) saturate(1.4); -webkit-backdrop-filter:blur(14px) saturate(1.4);
+      border-bottom:1px solid rgba(46,42,37,.08) !important; box-shadow:0 1px 14px rgba(46,42,37,.05); }
+    /* 商品/内容卡片：柔和阴影 */
+    [data-gt-card] { box-shadow:0 12px 32px rgba(46,42,37,.08), 0 2px 6px rgba(46,42,37,.04); }
+    [data-gt-card] img { border-radius: inherit; }
+    /* 按钮统一手感 */
+    button, a { transition: all .25s ease; }
+    [data-gt-chip]:hover { box-shadow:0 4px 14px rgba(194,112,62,.18); }
+    </style>
+    <script id="gt-ui2-js">
+    /* 全局颜色映射引擎：React 渲染后把黑/白/电光蓝体系映射为暖调体系 */
+    (function () {
+      var INK = [46, 42, 37], CREAM = [245, 239, 230], ACC = [194, 112, 62], ACCD = [224, 141, 87];
+      var PAPER = '#FAF7F1', SAND = '#F1EAE0', FOOT_BG = '#2E2A25', ACCENT = '#B5652F';
+      var W2I = { '0.25': 0.45, '0.3': 0.5, '0.35': 0.55, '0.4': 0.6, '0.45': 0.6, '0.5': 0.65, '0.6': 0.75, '0.7': 0.85 };
+      function rgba(c, a) { return 'rgba(' + c[0] + ', ' + c[1] + ', ' + c[2] + ', ' + a + ')'; }
+      function firstA(s) { var m = s.match(/0\.\d+/); return m ? parseFloat(m[0]) : 0; }
+
+      function retheme(root) {
+        var heroEl = document.getElementById('hero');
+        var navBar = (document.querySelector('nav') || {}).parentElement;
+        var all = root.nodeType === 1 ? [root].concat([].slice.call(root.querySelectorAll('*'))) : [];
+        all.forEach(function (el) {
+          if (!el || el.nodeType !== 1) return;
+          /* 已处理的元素：若内联样式里又出现蓝色（React 点击后动态改色），强制重处理 */
+          if (el.dataset.gtT) {
+            var st = el.getAttribute('style') || '';
+            if (!(st.indexOf('191, 255') > -1 || /#00[bB][fF][fF]/.test(st))) return;
+          }
+          el.dataset.gtT = '1';
+          if (el.id === 'gt-mobile-menu' || el.id === 'gt-mobile-btn') return;
+          if (heroEl && heroEl.contains(el)) return;
+          var inF = !!(el.closest && el.closest('footer'));
+          var cs;
+          try { cs = getComputedStyle(el); } catch (e) { return; }
+          /* SVG 矢量描边/填充 */
+          if (el.namespaceURI && el.namespaceURI.indexOf('svg') > -1) {
+            ['stroke', 'fill'].forEach(function (at) {
+              var v = el.getAttribute(at);
+              if (v && /191,\s*255|#00bfff/i.test(v)) {
+                var a = v.indexOf('rgba') > -1 ? firstA(v) : 1;
+                el.setAttribute(at, rgba(inF ? ACCD : ACC, inF ? Math.min(0.95, a + 0.1) : Math.max(0.5, a)));
+              }
+            });
+            return;
+          }
+          /* 背景 */
+          var bg = cs.backgroundColor;
+          if (bg && bg !== 'rgba(0, 0, 0, 0)') {
+            var v = null, card = 0;
+            if (bg === 'rgb(0, 0, 0)') v = inF ? FOOT_BG : PAPER;
+            else if (bg === 'rgb(5, 5, 5)') v = inF ? FOOT_BG : SAND;
+            else if (bg === 'rgb(17, 17, 17)') v = inF ? rgba(CREAM, 0.06) : '#FFFFFF';
+            else if (bg === 'rgb(0, 191, 255)') v = inF ? '#E08D57' : '#C2703E';
+            else if (/^rgba\(255, 255, 255, /.test(bg) && firstA(bg) <= 0.12) {
+              var a1 = firstA(bg);
+              if (inF) v = rgba(CREAM, Math.min(0.9, a1 + 0.06));
+              else { v = '#FFFFFF'; card = a1 <= 0.035 ? 1 : 2; }
+            }
+            else if (/^rgba\(0, 191, 255, /.test(bg)) {
+              var a2 = firstA(bg);
+              v = inF ? rgba(ACCD, Math.min(0.9, a2 + 0.04)) : rgba(ACC, Math.max(0.06, a2 * 0.85));
+            }
+            if (v) {
+              el.style.backgroundColor = v;
+              if (card === 1) el.setAttribute('data-gt-card', '');
+              else if (card === 2) el.setAttribute('data-gt-chip', '');
+            }
+          }
+          /* 文字 */
+          var c = cs.color;
+          if (c) {
+            var t = null;
+            if (c === 'rgb(255, 255, 255)') t = inF ? '#F5EFE6' : '#2E2A25';
+            else if (c === 'rgb(0, 0, 0)') t = '#FFFFFF';
+            else if (c === 'rgb(0, 191, 255)') t = inF ? '#E08D57' : ACCENT;
+            else if (/^rgba\(255, 255, 255, /.test(c)) {
+              var a3 = firstA(c);
+              t = inF ? rgba(CREAM, Math.min(0.92, a3 + 0.3)) : rgba(INK, W2I[String(a3)] !== undefined ? W2I[String(a3)] : Math.min(0.85, a3 + 0.15));
+            }
+            else if (/^rgba\(0, 191, 255, /.test(c)) {
+              var a4 = firstA(c);
+              t = inF ? rgba(ACCD, Math.min(0.95, a4 + 0.2)) : 'rgba(181, 101, 47, ' + Math.min(0.95, a4 + 0.2) + ')';
+            }
+            if (t) el.style.color = t;
+          }
+          /* 边框 */
+          if (cs.borderTopStyle !== 'none' && cs.borderTopWidth !== '0px') {
+            var bc = cs.borderTopColor, b = null;
+            if (/^rgba\(255, 255, 255, /.test(bc)) {
+              var a5 = firstA(bc);
+              b = inF ? rgba(CREAM, Math.min(0.5, a5 + 0.08)) : rgba(INK, Math.min(0.35, a5 + 0.05));
+            } else if (/^rgba\(0, 191, 255, /.test(bc)) {
+              b = inF ? rgba(ACCD, firstA(bc)) : rgba(ACC, Math.max(0.15, firstA(bc)));
+            }
+            if (b) el.style.borderColor = b;
+          }
+          /* 渐变/阴影里藏的蓝色（测评进度条等） */
+          var BI = cs.backgroundImage;
+          if (BI && BI.indexOf('191, 255') > -1) {
+            el.style.backgroundImage = BI.replace(/rgba?\(0, 191, 255[^)]*\)/g, function (m) {
+              return m.indexOf('rgba') > -1 ? rgba(inF ? ACCD : ACC, Math.max(0.35, firstA(m))) : (inF ? '#E08D57' : '#C2703E');
+            });
+          }
+          var BS = cs.boxShadow;
+          if (BS && BS !== 'none' && BS.indexOf('191, 255') > -1) {
+            el.style.boxShadow = BS.replace(/rgba?\(0, 191, 255[^)]*\)/g, function (m) {
+              return m.indexOf('rgba') > -1 ? rgba(inF ? ACCD : ACC, Math.max(0.25, firstA(m))) : (inF ? '#E08D57' : '#C2703E');
+            });
+          }
+          /* 顶栏玻璃化（nav 本身是固定顶栏） */
+          if (el.tagName === 'NAV') { el.setAttribute('data-gt-nav', ''); el.style.backgroundColor = 'rgba(250, 247, 241, 0.92)'; }
+        });
+      }
+      retheme(document.body);
+      /* React 挂载有延迟：定时补跑，未处理的元素会被拾起 */
+      [300, 1000, 2500].forEach(function (t) { setTimeout(function () { retheme(document.body); }, t); });
+      /* React 后续渲染（测评结果、弹层等）自动跟上：队列合并，不丢弃 */
+      var queued = [], timer = null;
+      function flush() { timer = null; var q = queued; queued = []; q.forEach(retheme); }
+      new MutationObserver(function (muts) {
+        muts.forEach(function (m) {
+          m.addedNodes.forEach(function (n) { if (n.nodeType === 1) queued.push(n); });
+          if (m.type === 'attributes' && m.target.nodeType === 1) {
+            var s = m.target.getAttribute('style') || '';
+            if (s.indexOf('191, 255') > -1 || /#00[bB][fF][fF]/.test(s)) queued.push(m.target);
+          }
+        });
+        if (queued.length && !timer) timer = setTimeout(flush, 80);
+      }).observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['style', 'class'] });
+      /* 双保险：低频扫描内联样式残留蓝色的元素（React 重渲染时机不可控） */
+      setInterval(function () {
+        var els = document.querySelectorAll('[style*="191, 255" i], [style*="#00bfff" i]');
+        for (var i = 0; i < els.length; i++) retheme(els[i]);
+      }, 600);
     })();
     </script>
   </body></html>
