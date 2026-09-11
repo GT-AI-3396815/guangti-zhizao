@@ -655,4 +655,626 @@
       setTimeout(function () { clearInterval(poll); }, 25000);
     })();
     </script>
-  </body></html>
+      <style id="gt-v4">
+    /* ========== V4：消费者决策链路补全层（详情/保障/下单/客服/订单/促销/合规） ========== */
+    .gt-toast { z-index: 300 !important; }
+    .gt4-mask { position: fixed; inset: 0; background: rgba(46,42,37,.45); z-index: 200; opacity: 0; pointer-events: none; transition: opacity .25s; }
+    .gt4-mask.open { opacity: 1; pointer-events: auto; }
+    .gt4-modal { position: fixed; left: 50%; top: 50%; transform: translate(-50%,-46%); width: min(760px, 94vw); max-height: 86vh; overflow-y: auto; background: #FAF7F1; border-radius: 20px; z-index: 205; padding: 28px; opacity: 0; pointer-events: none; transition: all .28s; box-shadow: 0 24px 80px rgba(46,42,37,.28); color: #2E2A25; }
+    .gt4-modal.open { opacity: 1; pointer-events: auto; transform: translate(-50%,-50%); }
+    .gt4-x { position: absolute; top: 14px; right: 16px; width: 34px; height: 34px; border: none; border-radius: 50%; background: rgba(46,42,37,.06); color: #2E2A25; font-size: 20px; cursor: pointer; line-height: 1; }
+    .gt4-x:hover { background: rgba(194,112,62,.16); }
+    .gt4-title { font-size: 20px; font-weight: 500; margin: 0 0 6px; }
+    .gt4-sub { font-size: 13px; color: rgba(46,42,37,.55); margin-bottom: 18px; }
+    /* 详情弹窗 */
+    .gt4-detail { display: flex; gap: 26px; }
+    .gt4-gal { flex: 0 0 44%; }
+    .gt4-gal-main { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 14px; border: 1px solid rgba(46,42,37,.08); }
+    .gt4-thumbs { display: flex; gap: 8px; margin-top: 10px; }
+    .gt4-thumbs img { width: 64px; height: 64px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; opacity: .75; }
+    .gt4-thumbs img.on { border-color: #C2703E; opacity: 1; }
+    .gt4-info { flex: 1; min-width: 0; }
+    .gt4-info h4 { font-size: 21px; font-weight: 500; margin: 0 0 4px; }
+    .gt4-pricerow { display: flex; align-items: baseline; gap: 12px; margin: 10px 0 2px; flex-wrap: wrap; }
+    .gt4-price { font-size: 26px; font-weight: 500; color: #B5652F; }
+    .gt4-orig { font-size: 13px; color: rgba(46,42,37,.45); text-decoration: line-through; }
+    .gt4-save { font-size: 12px; background: rgba(163,45,45,.1); color: #A32D2D; border-radius: 20px; padding: 3px 10px; }
+    .gt4-svc { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+    .gt4-svc span { font-size: 12px; background: rgba(194,112,62,.1); color: #B5652F; padding: 4px 10px; border-radius: 6px; }
+    .gt4-params { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 18px; margin: 14px 0; border-top: 1px dashed rgba(46,42,37,.15); padding-top: 14px; }
+    .gt4-params div { font-size: 13px; color: rgba(46,42,37,.75); }
+    .gt4-params b { font-weight: 500; color: #2E2A25; }
+    .gt4-hl { margin: 10px 0 16px; padding-left: 18px; }
+    .gt4-hl li { font-size: 13px; color: rgba(46,42,37,.8); line-height: 1.9; }
+    .gt4-btns { display: flex; gap: 12px; }
+    .gt4-btns button { flex: 1; padding: 13px 10px; border-radius: 10px; font-size: 15px; cursor: pointer; border: 1px solid #C2703E; }
+    .gt4-btn-sec { background: transparent; color: #B5652F; }
+    .gt4-btn-pri { background: #C2703E; color: #fff; }
+    .gt4-btn-pri:hover { background: #B5652F; }
+    /* 保障横幅 */
+    .gt-trustbar { display: flex; justify-content: center; gap: 34px; flex-wrap: wrap; margin: 0 auto 30px; padding: 14px 22px; background: #F1EAE0; border-radius: 12px; max-width: 1080px; }
+    .gt-trustbar span { font-size: 13px; color: #5F5E5A; display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
+    .gt-trustbar i { width: 7px; height: 7px; border-radius: 50%; background: #C2703E; flex-shrink: 0; }
+    /* 卡片立省标 */
+    .gt4-cardsave { display: inline-block; font-size: 11px; color: #A32D2D; background: rgba(163,45,45,.09); border-radius: 20px; padding: 2px 8px; margin-top: 5px; }
+    .gt4-cardorig { font-size: 12px; color: rgba(46,42,37,.42); text-decoration: line-through; margin-top: 4px; }
+    /* 购物车内：满减 + 搭配 */
+    .gt4-promo { margin: 10px 0 0; font-size: 12px; color: #5F5E5A; }
+    .gt4-promo-bar { height: 5px; border-radius: 4px; background: rgba(46,42,37,.1); margin-top: 6px; overflow: hidden; }
+    .gt4-promo-bar i { display: block; height: 100%; background: #C2703E; border-radius: 4px; transition: width .3s; }
+    .gt4-saverow { display: flex; justify-content: space-between; font-size: 13px; color: #A32D2D; margin-top: 8px; }
+    .gt4-upsell { border-top: 1px dashed rgba(46,42,37,.15); margin-top: 10px; padding: 10px 2px 0; display: flex; align-items: center; gap: 10px; }
+    .gt4-upsell img { width: 42px; height: 42px; border-radius: 8px; object-fit: cover; }
+    .gt4-upsell .t { flex: 1; font-size: 12px; color: #5F5E5A; min-width: 0; }
+    .gt4-upsell .t b { display: block; color: #2E2A25; font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .gt4-upsell button { border: 1px solid #C2703E; background: transparent; color: #B5652F; font-size: 12px; border-radius: 20px; padding: 5px 12px; cursor: pointer; white-space: nowrap; }
+    /* 表单 */
+    .gt4-form label { display: block; font-size: 13px; color: #5F5E5A; margin: 14px 0 6px; }
+    .gt4-form input, .gt4-form textarea { width: 100%; box-sizing: border-box; border: 1px solid rgba(46,42,37,.18); border-radius: 10px; background: #fff; padding: 11px 13px; font-size: 14px; color: #2E2A25; outline: none; }
+    .gt4-form input:focus, .gt4-form textarea:focus { border-color: #C2703E; }
+    .gt4-pay { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
+    .gt4-pay label { margin: 0; flex: 1; min-width: 96px; border: 1px solid rgba(46,42,37,.18); border-radius: 10px; padding: 10px 8px; text-align: center; font-size: 13px; color: #2E2A25; cursor: pointer; background: #fff; }
+    .gt4-pay input { display: none; }
+    .gt4-pay label.on { border-color: #C2703E; background: rgba(194,112,62,.08); color: #B5652F; }
+    .gt4-invoice { font-size: 12px; color: rgba(46,42,37,.55); margin-top: 10px; }
+    .gt4-sumline { display: flex; justify-content: space-between; font-size: 13px; color: #5F5E5A; margin-top: 6px; }
+    .gt4-sumline.disc { color: #A32D2D; }
+    .gt4-sumline.all { font-size: 16px; color: #2E2A25; margin-top: 10px; }
+    .gt4-ok { text-align: center; padding: 18px 6px 6px; }
+    .gt4-ok .num { font-size: 20px; font-weight: 500; color: #B5652F; letter-spacing: .04em; margin: 10px 0; }
+    .gt4-ok p { font-size: 13px; color: #5F5E5A; line-height: 1.9; margin: 6px 0; }
+    /* 报告 */
+    .gt4-rep { border: 1px solid rgba(46,42,37,.1); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; background: #fff; }
+    .gt4-rep b { font-size: 14px; font-weight: 500; display: block; }
+    .gt4-rep .no { font-size: 12px; color: #B5652F; margin: 3px 0 6px; }
+    .gt4-rep p { font-size: 13px; color: #5F5E5A; margin: 0; line-height: 1.7; }
+    .gt4-rep.hit { border-color: #C2703E; background: rgba(194,112,62,.06); }
+    /* 证书链接样式 */
+    .gt4-certlink { cursor: pointer !important; border-bottom: 1px dashed #B5652F; transition: color .2s; }
+    .gt4-certlink:hover { color: #B5652F; }
+    /* 客服悬浮按钮 */
+    .gt4-servicefab { position: fixed; right: 18px; bottom: 158px; width: 46px; height: 46px; border-radius: 50%; border: none; background: #FAF7F1; color: #B5652F; box-shadow: 0 4px 18px rgba(46,42,37,.2); cursor: pointer; z-index: 95; display: flex; align-items: center; justify-content: center; }
+    .gt4-servicefab:hover { background: #F1EAE0; }
+    /* 积分说明 / FAQ / 页脚栏 */
+    .gt4-points { max-width: 1080px; margin: 26px auto 0; padding: 16px 22px; background: rgba(194,112,62,.07); border: 1px dashed rgba(194,112,62,.4); border-radius: 12px; font-size: 13px; color: #5F5E5A; line-height: 2; }
+    .gt4-points b { color: #B5652F; font-weight: 500; }
+    .gt4-faq { max-width: 1080px; margin: 34px auto 0; }
+    .gt4-faq details { background: #fff; border: 1px solid rgba(46,42,37,.09); border-radius: 12px; margin-bottom: 10px; padding: 15px 20px; }
+    .gt4-faq summary { font-size: 14px; font-weight: 500; cursor: pointer; color: #2E2A25; }
+    .gt4-faq p { font-size: 13px; color: #5F5E5A; line-height: 1.9; margin: 10px 0 0; }
+    .gt4-footerbar { border-top: 1px solid rgba(255,255,255,.12); margin-top: 34px; padding: 22px 20px 16px; text-align: center; font-size: 12px; color: rgba(255,255,255,.55); line-height: 2; }
+    .gt4-footerbar a { color: rgba(255,255,255,.8); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; margin: 0 10px; }
+    .gt4-footerbar a:hover { color: #E08D57; }
+    /* 手机端 */
+    @media (max-width: 768px) {
+      .gt4-modal { left: 0; right: 0; top: auto; bottom: 0; transform: translateY(30px); width: 100%; max-width: 100vw; max-height: 88vh; border-radius: 20px 20px 0 0; padding: 22px 18px; }
+      .gt4-modal.open { transform: translateY(0); }
+      .gt4-detail { flex-direction: column; gap: 16px; }
+      .gt4-gal { flex: none; }
+      .gt4-gal-main { aspect-ratio: 4/3; }
+      .gt-trustbar { gap: 12px 18px; justify-content: flex-start; }
+      .gt-trustbar span { white-space: normal; }
+      .gt4-servicefab { bottom: 150px; right: 14px; width: 42px; height: 42px; }
+      .gt4-params { grid-template-columns: 1fr; }
+      .gt4-footerbar a { display: inline-block; margin: 2px 8px; }
+      .gt4-faqsec > div { padding: 48px 18px 4px !important; }
+    }
+    </style>
+    <script id="gt-v4-js">
+    /* ========== V4 消费者补全层 ========== */
+    (function () {
+      /* ---- 可配置项（上线前只需改这里） ---- */
+      var GT4 = {
+        svc: { wechat: 'guangti-zhizao', hours: '每日 9:00 – 21:00', phone: '' },
+        company: '运营主体：光体•智造 品牌直营 · 合作智造：康钛源器皿 / 卡特马克厨具（新三板挂牌）',
+        icp: 'ICP 备案号：备案审核中，正式上线前替换为真实备案号',
+        freeShip: 399,
+        promos: [{ min: 2999, cut: 300 }, { min: 999, cut: 100 }]
+      };
+      function el(html) { var d = document.createElement('div'); d.innerHTML = html.trim(); return d.firstChild; }
+      function own(node) { node.setAttribute('data-gt4-own', ''); return node; }
+      var toastT = null;
+      function toast(msg) {
+        var t = document.querySelector('.gt-toast');
+        if (!t) { t = own(el('<div class="gt-toast"></div>')); document.body.appendChild(t); }
+        t.textContent = msg; t.classList.add('show');
+        clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove('show'); }, 2400);
+      }
+      function readCart() { try { return JSON.parse(localStorage.getItem('gt-cart') || '[]'); } catch (e) { return []; } }
+      function writeCart(c) { try { localStorage.setItem('gt-cart', JSON.stringify(c)); } catch (e) {} }
+      function refreshBadge() {
+        var b = document.querySelector('.gt-cartfab .gt-badge');
+        if (!b) return;
+        var n = readCart().reduce(function (s, i) { return s + i.qty; }, 0);
+        b.textContent = n; b.style.display = n > 0 ? 'flex' : 'none';
+      }
+      function addToCart(name, price) {
+        var c = readCart();
+        var hit = c.find(function (i) { return i.name === name; });
+        hit ? hit.qty++ : c.push({ name: name, price: price, qty: 1 });
+        writeCart(c); refreshBadge();
+        toast('已加入购物车：' + name);
+        var fab = document.querySelector('.gt-cartfab');
+        if (fab) fab.animate([{ transform: 'scale(1)' }, { transform: 'scale(1.18)' }, { transform: 'scale(1)' }], { duration: 320 });
+      }
+      function promoFor(t) {
+        var best = null;
+        GT4.promos.forEach(function (p) { if (t >= p.min && (!best || p.cut > best.cut)) best = p; });
+        return best;
+      }
+      function nextPromo(t) {
+        var arr = GT4.promos.slice().sort(function (a, b) { return a.min - b.min; });
+        for (var i = 0; i < arr.length; i++) if (t < arr[i].min) return arr[i];
+        return null;
+      }
+
+      /* ---- 商品数据（规格参数为参考值，上线前可按实物校准） ---- */
+      var P = {
+        '纯钛直杯·能量款 200ml': { price: 399, orig: 499, img: './prod-cup1.jpg', gal: ['./prod-cup1.jpg', './scene-banner-1.jpg', './hero-cup.jpg'],
+          params: [['容量', '200ml'], ['尺寸', 'Φ65 × 88 mm'], ['重量', '约 58 g'], ['材质', 'TA1 纯钛 · 彩钛工艺'], ['适用', '冷热饮 · 车载 · 办公'], ['质保', '2 年']],
+          hl: ['纯钛单层杯身，轻至 58g，通勤包里无感随身', 'TDNS 新材料杯芯，饮水口感更柔顺', '杯口卷边工艺，不挂唇不刮手'] },
+        '纯钛绅士杯·能量款 400ml': { price: 688, orig: 799, img: './prod-cup2.jpg', gal: ['./prod-cup2.jpg', './scene-banner-1.jpg', './hero-cup.jpg'],
+          params: [['容量', '400ml'], ['尺寸', 'Φ78 × 108 mm'], ['重量', '约 82 g'], ['材质', 'TA1 纯钛 · 彩钛工艺'], ['适用', '商务办公 · 会议 · 差旅'], ['质保', '2 年']],
+          hl: ['400ml 大容量，一次接水全程够用', '哑光彩钛杯身，商务场合更显品位', '可搭配激光刻字，名片级商务礼品'] },
+        '锲金画·非遗收藏杯': { price: 1880, orig: 2280, img: './scene-lacquer.jpg', gal: ['./scene-lacquer.jpg', './bundle-gift.jpg'],
+          params: [['容量', '260ml'], ['尺寸', 'Φ70 × 96 mm'], ['重量', '约 72 g'], ['材质', 'TA1 纯钛 · 非遗锲金手工'], ['附赠', '收藏证书 · 编号唯一'], ['质保', '终身工艺保障']],
+          hl: ['非遗锲金工艺手工錾刻，每件纹样独一无二', '限量发行，附编号收藏证书', '附定制礼盒，赠礼收藏两相宜'] },
+        '纯钛蘑菇杯·能量款 260ml': { price: 458, orig: 528, img: './prod-cup4.jpg', gal: ['./prod-cup4.jpg', './scene-banner-1.jpg', './hero-cup.jpg'],
+          params: [['容量', '260ml'], ['尺寸', 'Φ70 × 95 mm'], ['重量', '约 66 g'], ['材质', 'TA1 纯钛 · 彩钛工艺'], ['适用', '日常随行 · 家用'], ['质保', '2 年']],
+          hl: ['蘑菇造型圆润顺手，握感出众', '260ml 黄金容量，咖啡茶饮皆宜', '轻量耐摔，亲子家庭也放心'] },
+        '纯钛能量茶壶': { price: 1280, orig: 1480, img: './prod-tea1.jpg', gal: ['./prod-tea1.jpg', './scene-banner-3.jpg', './bundle-tea.jpg'],
+          params: [['容量', '600ml'], ['尺寸', 'Φ92 × 120 mm'], ['重量', '约 128 g'], ['材质', 'TA1 纯钛 · 一体滤网'], ['适用', '旅居茶事 · 民宿 · 办公室'], ['质保', '2 年']],
+          hl: ['一体滤网不堵不涩，红茶绿茶一壶通泡', 'TDNS 新材料内胆，茶汤更顺滑耐泡', '轻至 128g，旅居行囊零负担'] },
+        '茶杯套装(4只)': { price: 898, orig: 998, img: './prod-tea2.jpg', gal: ['./prod-tea2.jpg', './scene-banner-3.jpg', './bundle-tea.jpg'],
+          params: [['规格', '4 只 × 60ml'], ['单只尺寸', 'Φ52 × 48 mm'], ['单只重量', '约 22 g'], ['材质', 'TA1 纯钛'], ['附赠', '便携收纳盒'], ['质保', '2 年']],
+          hl: ['四杯成套，雅集待客一套备齐', '轻盈不烫手，老茶客与新手都好用', '附收纳盒，收纳携带一步到位'] },
+        '咖啡杯套装(2只)': { price: 568, orig: 638, img: './prod-tea3.jpg', gal: ['./prod-tea3.jpg', './scene-banner-3.jpg', './bundle-tea.jpg'],
+          params: [['规格', '2 只 × 120ml'], ['单只重量', '约 30 g'], ['材质', 'TA1 纯钛'], ['适用', '手冲 · 拿铁 · 冷萃'], ['附赠', '便携收纳盒'], ['质保', '2 年']],
+          hl: ['120ml 咖啡黄金容量，香气更聚拢', '纯钛不串味，今天咖啡明天茶', '露营手冲氛围感利器'] },
+        '八角能量炒锅·TDNS涂层': { price: 1580, orig: 1880, img: './prod-pot1.jpg', gal: ['./prod-pot1.jpg', './scene-kitchen.jpg'],
+          params: [['口径', '32 cm'], ['重量', '约 1.1 kg'], ['工艺', 'TDNS 能量涂层 · 复合锅底'], ['炉灶', '燃气 / 电磁炉通用'], ['认证', 'CTI 全项认证'], ['质保', '2 年']],
+          hl: ['八角锅身翻锅顺手，爆炒更省力', 'TDNS 涂层少油不粘，锁住食材原香', '德国 CNC 加工锅体，导热均匀少油烟'] },
+        '能量汤锅': { price: 1280, orig: 1480, img: './prod-pot2.jpg', gal: ['./prod-pot2.jpg', './scene-kitchen.jpg'],
+          params: [['口径', '24 cm'], ['重量', '约 0.9 kg'], ['工艺', 'TDNS 能量涂层 · 复合锅底'], ['炉灶', '燃气 / 电磁炉通用'], ['适用', '炖汤 · 煮面 · 焖烧'], ['质保', '2 年']],
+          hl: ['汤色清亮，炖汤更出味', '一锅多用，炖煮焖烧全覆盖', '锅盖可视窗，火候一眼掌握'] },
+        '能量奶锅': { price: 880, orig: 1028, img: './prod-pot3.jpg', gal: ['./prod-pot3.jpg', './scene-kitchen.jpg'],
+          params: [['口径', '16 cm'], ['重量', '约 0.4 kg'], ['工艺', 'TDNS 能量涂层'], ['炉灶', '燃气 / 电磁炉通用'], ['适用', '热奶 · 辅食 · 煮粥'], ['质保', '2 年']],
+          hl: ['热奶不糊底，宝宝辅食更安心', '小巧轻便，一人食刚刚好', '导热快，早餐效率翻倍'] },
+        '能量煎锅': { price: 1180, orig: 1380, img: './prod-pot4.jpg', gal: ['./prod-pot4.jpg', './scene-kitchen.jpg'],
+          params: [['口径', '28 cm'], ['重量', '约 0.8 kg'], ['工艺', 'TDNS 能量涂层'], ['炉灶', '燃气 / 电磁炉通用'], ['适用', '煎鱼 · 牛排 · 早餐'], ['质保', '2 年']],
+          hl: ['煎鱼不破皮，少油也够香', '锅底受热均匀，牛排边缘不焦', '轻量化设计，女生单手也颠得动'] },
+        '纯钛餐具套装': { price: 1680, orig: 1980, img: './prod-set1.jpg', gal: ['./prod-set1.jpg', './scene-family.jpg'],
+          params: [['规格', '筷 · 勺 · 叉 3 件装'], ['重量', '全套约 45 g'], ['材质', 'TA1 纯钛'], ['附赠', '便携收纳盒'], ['适用', '家庭用餐 · 户外露营'], ['质保', '2 年']],
+          hl: ['全家人的放心餐具，零涂层零析出', '轻若无物，露营装备减重首选', '附收纳盒，收纳携带一步到位'] },
+        '养生焖壶': { price: 980, orig: 1128, img: './prod-set2.jpg', gal: ['./prod-set2.jpg', './scene-family.jpg'],
+          params: [['容量', '1200ml'], ['重量', '约 210 g'], ['材质', 'TA1 纯钛 · 焖烧两用'], ['适用', '粥汤 · 花茶 · 便当'], ['质保', '2 年']],
+          hl: ['睡前投米，早起喝到温热好粥', '焖烧两用，上班族的养生搭子', '大口径好清洗，一冲即净'] },
+        '纯钛旅行壶 800ml': { price: 980, orig: 1180, img: './prod-set3.jpg', gal: ['./prod-set3.jpg', './scene-banner-2.jpg'],
+          params: [['容量', '800ml'], ['尺寸', 'Φ80 × 210 mm'], ['重量', '约 158 g'], ['材质', 'TA1 纯钛'], ['适用', '自驾露营 · 可明火加热'], ['质保', '2 年']],
+          hl: ['可直接明火烧水，营地泡茶煮咖啡', '轻至 158g，背包无负担', '800ml 大容量，一人整日饮水够用'] }
+      };
+      var BUNDLES = {
+        'bundle-business.jpg': { name: '商旅随行双杯套装', price: 1280, orig: null, img: './bundle-business.jpg', gal: ['./bundle-business.jpg', './scene-banner-1.jpg'],
+          params: [['内含', '直杯 200ml × 1 · 绅士杯 400ml × 1'], ['附赠', '活化使用教程 · 便携收纳袋'], ['适用', '高铁 · 航班 · 酒店'], ['质保', '2 年']],
+          hl: ['商旅三大场景通用，一杯凉水一杯咖啡', '双杯同发，自用送人两不误', '收纳袋随身，差旅打包更清爽'] },
+        'bundle-drive.jpg': { name: '自驾畅行车载套装', price: 1680, orig: null, img: './bundle-drive.jpg', gal: ['./bundle-drive.jpg', './scene-banner-2.jpg'],
+          params: [['内含', '旅行壶 800ml × 1 · 纯钛饭盒 × 1 · 可明火直杯 × 1'], ['附赠', '车载收纳袋'], ['适用', '自驾 · 露营 · 车载'], ['质保', '2 年']],
+          hl: ['服务区烧水、营地泡茶、路上用餐一站备齐', '全套装可明火，旷野也能吃上热乎的', '车载收纳袋固定不晃，随停随取'] },
+        'bundle-tea.jpg': { name: '旅居茶事慢活套装', price: 2580, orig: 3160, img: './bundle-tea.jpg', gal: ['./bundle-tea.jpg', './scene-banner-3.jpg'],
+          params: [['内含', '旅行壶 × 1 · 能量茶壶 × 1 · 茶杯 × 4'], ['附赠', '旅居茶事手册'], ['适用', '民宿长住 · 旅居办公'], ['质保', '2 年']],
+          hl: ['单买合计 ¥3,160，套装一次省 ¥578', '一壶一盏一手册，旅居茶席即刻开张', '民宿长住也能泡出有仪式感的慢生活'] },
+        'bundle-gift.jpg': { name: '高端商务礼赠套装', price: 5880, orig: null, img: './bundle-gift.jpg', gal: ['./bundle-gift.jpg', './scene-lacquer.jpg'],
+          params: [['内含', '锲金画非遗收藏杯 × 1 · 绅士杯 400ml × 1'], ['附赠', '光体定制礼盒 · 品牌溯源证书'], ['适用', '高端商务馈赠 · 收藏'], ['质保', '终身工艺保障']],
+          hl: ['非遗锲金 + TDNS 新材料，科技与工艺双背书', '定制礼盒 + 溯源证书，送出手极有分量', '限量收藏款，礼赠收藏两相宜'] }
+      };
+
+      /* ---- 弹窗框架 ---- */
+      var mask4 = null, modal4 = null;
+      function ensureFrame() {
+        if (mask4) return;
+        mask4 = own(el('<div class="gt4-mask"></div>'));
+        modal4 = own(el('<div class="gt4-modal"><button class="gt4-x" aria-label="关闭">×</button><div class="gt4-body"></div></div>'));
+        document.body.appendChild(mask4); document.body.appendChild(modal4);
+        mask4.addEventListener('click', closeAll);
+        modal4.querySelector('.gt4-x').addEventListener('click', closeAll);
+        document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeAll(); });
+      }
+      function closeAll() {
+        if (mask4) mask4.classList.remove('open');
+        if (modal4) modal4.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+      function openModal(html, after) {
+        ensureFrame();
+        modal4.querySelector('.gt4-body').innerHTML = html;
+        modal4.classList.add('open'); mask4.classList.add('open');
+        document.body.style.overflow = 'hidden';
+        if (after) after(modal4);
+      }
+
+      /* ---- 详情弹窗 ---- */
+      function detailHTML(d, displayName) {
+        var saveTxt = d.orig ? '<span class="gt4-save">限时直降 · 立省 ¥' + (d.orig - d.price).toLocaleString() + '</span>' : '';
+        return '<div class="gt4-detail"><div class="gt4-gal"><img class="gt4-gal-main" src="' + d.gal[0] + '" alt="' + displayName + '">' +
+          '<div class="gt4-thumbs">' + d.gal.map(function (g, i) { return '<img src="' + g + '"' + (i === 0 ? ' class="on"' : '') + '>'; }).join('') + '</div></div>' +
+          '<div class="gt4-info"><h4>' + displayName + '</h4>' +
+          '<div class="gt4-pricerow"><span class="gt4-price">¥' + d.price.toLocaleString() + '</span>' + (d.orig ? '<span class="gt4-orig">市场参考价 ¥' + d.orig.toLocaleString() + '</span>' : '') + saveTxt + '</div>' +
+          '<div class="gt4-svc"><span>顺丰包邮（满 ¥399）</span><span>七天无理由退换</span><span>48 小时内发货</span><span>' + (displayName.indexOf('收藏') > -1 ? '终身工艺保障' : '两年质保') + '</span></div>' +
+          '<ul class="gt4-hl">' + d.hl.map(function (h) { return '<li>' + h + '</li>'; }).join('') + '</ul>' +
+          '<div class="gt4-params">' + d.params.map(function (p) { return '<div>' + p[0] + '：<b>' + p[1] + '</b></div>'; }).join('') + '</div>' +
+          '<div class="gt4-btns"><button class="gt4-btn-sec" data-act="cart">加入购物车</button><button class="gt4-btn-pri" data-act="buy">立即购买</button></div>' +
+          '</div></div>';
+      }
+      function openDetail(name, d) {
+        openModal(detailHTML(d, name), function (m) {
+          var main = m.querySelector('.gt4-gal-main');
+          m.querySelectorAll('.gt4-thumbs img').forEach(function (t) {
+            t.addEventListener('click', function () {
+              main.src = t.src;
+              m.querySelectorAll('.gt4-thumbs img').forEach(function (x) { x.classList.remove('on'); });
+              t.classList.add('on');
+            });
+          });
+          m.querySelector('[data-act="cart"]').addEventListener('click', function () { addToCart(name, d.price); });
+          m.querySelector('[data-act="buy"]').addEventListener('click', function () {
+            addToCart(name, d.price); closeAll(); setTimeout(openCheckout, 250);
+          });
+        });
+      }
+      /* 商品卡：点卡片（非按钮）开详情 */
+      document.addEventListener('click', function (e) {
+        if (e.target.closest('button, a, .gt4-modal, .gt-drawer, .gt4-servicefab')) return;
+        var card = e.target.closest('[data-gt-name]');
+        if (card && P[card.dataset.gtName]) { openDetail(card.dataset.gtName, P[card.dataset.gtName]); return; }
+        var bimg = e.target.closest('[data-gt4-bundle]');
+        if (bimg && BUNDLES[bimg.dataset.gt4Bundle]) { openDetail(BUNDLES[bimg.dataset.gt4Bundle].name, BUNDLES[bimg.dataset.gt4Bundle]); }
+      });
+
+      /* ---- 卡片价格锚点（划线价 + 立省标） ---- */
+      function buildPriceAnchors() {
+        document.querySelectorAll('[data-gt-name]').forEach(function (card) {
+          if (card.dataset.gt4done) return;
+          var d = P[card.dataset.gtName];
+          if (!d || !d.orig) return;
+          card.dataset.gt4done = '1';
+          var priceEl = null;
+          card.querySelectorAll('*').forEach(function (n) {
+            if (priceEl || n.children.length) return;
+            if (/^¥[\d,]+$/.test((n.textContent || '').trim())) priceEl = n;
+          });
+          var tag = el('<div><div class="gt4-cardorig">市场参考价 ¥' + d.orig.toLocaleString() + '</div><span class="gt4-cardsave">立省 ¥' + (d.orig - d.price).toLocaleString() + '</span></div>');
+          if (priceEl && priceEl.parentNode) priceEl.parentNode.insertBefore(tag, priceEl.nextSibling);
+          else card.appendChild(tag);
+        });
+      }
+      /* 场景套装卡：绑定 bundle 图片 → 详情 */
+      function bindBundles() {
+        document.querySelectorAll('#scenarios img[src*="bundle-"]').forEach(function (img) {
+          var key = (img.getAttribute('src') || '').split('/').pop();
+          if (!BUNDLES[key]) return;
+          var host = img.closest('[data-gt4-bundle]');
+          if (host) return;
+          var cardEl = img;
+          var up = img;
+          for (var i = 0; i < 4; i++) {
+            up = up.parentElement;
+            if (!up) break;
+            if ((up.textContent || '').indexOf('¥') > -1 && up.querySelector('img') === img) { cardEl = up; break; }
+          }
+          cardEl.setAttribute('data-gt4-bundle', key);
+          cardEl.style.cursor = 'pointer';
+        });
+      }
+
+      /* ---- 保障横幅 ---- */
+      function buildTrustbar() {
+        var bar = document.querySelector('.gt-shopbar');
+        if (!bar || document.querySelector('.gt-trustbar')) return;
+        var tb = own(el('<div class="gt-trustbar"><span><i></i>顺丰包邮 · 满 ¥399 包邮</span><span><i></i>七天无理由退换</span><span><i></i>两年质保 · 全国联保</span><span><i></i>48 小时内发货 · 支持验货</span></div>'));
+        bar.parentNode.insertBefore(tb, bar.nextSibling);
+      }
+
+      /* ---- 购物车增强：支付说明 / 满减 / 搭配推荐 / 接管下单 ---- */
+      var promoBox = null, saveBox = null, upsellBox = null;
+      var SUGGESTS = ['纯钛旅行壶 800ml', '能量汤锅', '茶杯套装(4只)', '纯钛餐具套装', '咖啡杯套装(2只)', '养生焖壶'];
+      function cartEnhance() {
+        var drawer = document.querySelector('.gt-drawer');
+        if (!drawer || drawer.dataset.gt4done) return;
+        drawer.dataset.gt4done = '1';
+        var note = drawer.querySelector('.gt-drawer-note');
+        if (note) note.textContent = '支持微信 / 支付宝 / 对公转账 · 电子发票随单自动开具';
+        var foot = drawer.querySelector('.gt-drawer-f');
+        if (foot) {
+          promoBox = own(el('<div class="gt4-promo"><span></span><div class="gt4-promo-bar"><i></i></div></div>'));
+          saveBox = own(el('<div class="gt4-saverow" style="display:none"><span>满减优惠</span><b></b></div>'));
+          foot.insertBefore(promoBox, foot.querySelector('.gt-checkout'));
+          foot.insertBefore(saveBox, foot.querySelector('.gt-checkout'));
+        }
+        var list = drawer.querySelector('.gt-drawer-list');
+        upsellBox = own(el('<div class="gt4-upsell" style="display:none"></div>'));
+        if (list && list.parentNode) list.parentNode.insertBefore(upsellBox, list.nextSibling);
+        /* 接管「立即下单」 */
+        var btn = drawer.querySelector('.gt-checkout');
+        if (btn) {
+          var nb = btn.cloneNode(true);
+          btn.parentNode.replaceChild(nb, btn);
+          nb.addEventListener('click', function () {
+            if (!readCart().length) { toast('购物车还是空的，先去挑一件钛宝贝吧'); return; }
+            openCheckout();
+          });
+        }
+        var mo = new MutationObserver(function () { updatePromo(); updateUpsell(); });
+        mo.observe(drawer.querySelector('.gt-drawer-list'), { childList: true });
+        mo.observe(drawer.querySelector('.gt-total b'), { childList: true, characterData: true, subtree: true });
+        updatePromo(); updateUpsell();
+      }
+      function drawerTotal() {
+        var b = document.querySelector('.gt-drawer .gt-total b');
+        if (!b) return 0;
+        var n = parseInt((b.textContent || '').replace(/[^\d]/g, ''), 10);
+        return isNaN(n) ? 0 : n;
+      }
+      function updatePromo() {
+        if (!promoBox) return;
+        var t = drawerTotal();
+        var hit = promoFor(t), nxt = nextPromo(t);
+        var span = promoBox.querySelector('span'), fill = promoBox.querySelector('.gt4-promo-bar i');
+        if (hit) {
+          span.textContent = '已满足满 ¥' + hit.min.toLocaleString() + ' 减 ¥' + hit.cut + '，结算时自动抵扣';
+          fill.style.width = '100%';
+        } else if (nxt) {
+          span.textContent = '还差 ¥' + (nxt.min - t).toLocaleString() + ' 即可减 ¥' + nxt.cut + '，加一件就够';
+          fill.style.width = Math.min(100, Math.round(t / nxt.min * 100)) + '%';
+        } else { span.textContent = '当前已享最优满减'; fill.style.width = '100%'; }
+        if (saveBox) {
+          if (hit) { saveBox.style.display = 'flex'; saveBox.querySelector('b').textContent = '- ¥' + hit.cut + '（满减）'; }
+          else saveBox.style.display = 'none';
+        }
+      }
+      function updateUpsell() {
+        if (!upsellBox) return;
+        var c = readCart();
+        if (!c.length) { upsellBox.style.display = 'none'; return; }
+        var names = c.map(function (i) { return i.name; });
+        var pick = null;
+        for (var i = 0; i < SUGGESTS.length; i++) {
+          if (names.indexOf(SUGGESTS[i]) === -1 && P[SUGGESTS[i]]) { pick = SUGGESTS[i]; break; }
+        }
+        if (!pick) { upsellBox.style.display = 'none'; return; }
+        var d = P[pick];
+        upsellBox.style.display = 'flex';
+        upsellBox.innerHTML = '<img src="' + d.img + '" alt=""><div class="t"><b>顺手带一件：' + pick + '</b>加购免运费门槛，凑单更划算</div><button>¥' + d.price.toLocaleString() + ' 加入</button>';
+        upsellBox.querySelector('button').onclick = function () { addToCart(pick, d.price); updateUpsell(); updatePromo(); };
+      }
+
+      /* ---- 留资下单（收银台） ---- */
+      function openCheckout() {
+        var c = readCart();
+        var t = c.reduce(function (s, i) { return s + i.price * i.qty; }, 0);
+        var hit = promoFor(t);
+        var pay = t - (hit ? hit.cut : 0);
+        var itemsTxt = c.map(function (i) { return i.name + ' × ' + i.qty; }).join('；');
+        openModal('<h3 class="gt4-title">确认订单</h3><div class="gt4-sub">填写收货信息，提交后品牌顾问将电话与您确认支付</div>' +
+          '<div class="gt4-form">' +
+          '<label>收货人姓名</label><input id="gt4-name" type="text" maxlength="20" placeholder="请输入姓名">' +
+          '<label>手机号（用于订单查询与发货通知）</label><input id="gt4-phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号">' +
+          '<label>收货地址</label><input id="gt4-addr" type="text" maxlength="120" placeholder="省 / 市 / 区 + 详细地址">' +
+          '<label>备注留言（选填）</label><textarea rows="2" maxlength="120" placeholder="刻字需求、配送偏好等"></textarea>' +
+          '<label>支付方式</label><div class="gt4-pay">' +
+          '<label class="on"><input type="radio" name="gt4pay" value="微信支付" checked>微信支付</label>' +
+          '<label><input type="radio" name="gt4pay" value="支付宝">支付宝</label>' +
+          '<label><input type="radio" name="gt4pay" value="对公转账">对公转账</label></div>' +
+          '<div class="gt4-invoice">支持开具电子发票，下单后 24 小时内随短信链接送达</div>' +
+          '<div class="gt4-sumline"><span>商品合计</span><span>¥' + t.toLocaleString() + '</span></div>' +
+          (hit ? '<div class="gt4-sumline disc"><span>满减优惠（满 ¥' + hit.min.toLocaleString() + ' 减 ¥' + hit.cut + '）</span><span>- ¥' + hit.cut + '</span></div>' : '') +
+          '<div class="gt4-sumline all"><span>应付金额</span><b>¥' + pay.toLocaleString() + '</b></div>' +
+          '<div class="gt4-btns" style="margin-top:16px"><button class="gt4-btn-sec" data-act="back">返回购物车</button><button class="gt4-btn-pri" data-act="submit">提交订单</button></div>' +
+          '</div>', function (m) {
+            m.querySelectorAll('.gt4-pay label').forEach(function (lb) {
+              lb.addEventListener('click', function () {
+                m.querySelectorAll('.gt4-pay label').forEach(function (x) { x.classList.remove('on'); });
+                lb.classList.add('on');
+                lb.querySelector('input').checked = true;
+              });
+            });
+            m.querySelector('[data-act="back"]').addEventListener('click', closeAll);
+            m.querySelector('[data-act="submit"]').addEventListener('click', function () {
+              var name = m.querySelector('#gt4-name').value.trim();
+              var phone = m.querySelector('#gt4-phone').value.trim();
+              var addr = m.querySelector('#gt4-addr').value.trim();
+              if (!name) { toast('请填写收货人姓名'); return; }
+              if (!/^1\d{10}$/.test(phone)) { toast('请输入正确的 11 位手机号'); return; }
+              if (!addr || addr.length < 5) { toast('请填写完整收货地址'); return; }
+              var payMethod = m.querySelector('input[name="gt4pay"]:checked').value;
+              var d = new Date();
+              var oid = 'GT' + d.getFullYear() + ('0' + (d.getMonth() + 1)).slice(-2) + ('0' + d.getDate()).slice(-2) + '-' + Math.floor(1000 + Math.random() * 9000);
+              var orders = [];
+              try { orders = JSON.parse(localStorage.getItem('gt-orders') || '[]'); } catch (e) {}
+              orders.unshift({ id: oid, name: name, phone: phone, addr: addr, pay: payMethod, items: itemsTxt, total: t, discount: hit ? hit.cut : 0, due: pay, at: d.toLocaleString('zh-CN'), status: '顾问确认中' });
+              try { localStorage.setItem('gt-orders', JSON.stringify(orders)); } catch (e) {}
+              writeCart([]); refreshBadge();
+              m.querySelector('.gt4-body').innerHTML = '<div class="gt4-ok"><h3 class="gt4-title">订单提交成功</h3><div class="num">' + oid + '</div>' +
+                '<p>应付金额 <b style="color:#B5652F">¥' + pay.toLocaleString() + '</b> · ' + payMethod + '</p>' +
+                '<p>品牌顾问将在 24 小时内致电 ' + phone.replace(/(\d{3})\d{4}(\d{4})/, '$1****$2') + ' 与您确认支付与发货事宜</p>' +
+                '<p style="color:rgba(46,42,37,.45)">电子发票将在支付确认后 24 小时内送达 · 七天无理由退换 · 两年质保</p>' +
+                '<div class="gt4-btns"><button class="gt4-btn-sec" data-act="order">查我的订单</button><button class="gt4-btn-pri" data-act="done">完成</button></div></div>';
+              m.querySelector('[data-act="done"]').addEventListener('click', closeAll);
+              m.querySelector('[data-act="order"]').addEventListener('click', function () { openOrders(phone); });
+            });
+          });
+      }
+
+      /* ---- 订单查询 ---- */
+      function openOrders(prefill) {
+        openModal('<h3 class="gt4-title">订单查询</h3><div class="gt4-sub">输入下单时的手机号，查询您的订单</div>' +
+          '<div class="gt4-form"><label>手机号</label><input id="gt4-qphone" type="tel" maxlength="11" placeholder="请输入 11 位手机号" value="' + (prefill || '') + '">' +
+          '<div class="gt4-btns" style="margin-top:16px"><button class="gt4-btn-pri" data-act="q">查询</button></div><div class="gt4-list"></div></div>', function (m) {
+            var list = m.querySelector('.gt4-list');
+            function q() {
+              var phone = m.querySelector('#gt4-qphone').value.trim();
+              if (!/^1\d{10}$/.test(phone)) { toast('请输入正确的 11 位手机号'); return; }
+              var orders = [];
+              try { orders = JSON.parse(localStorage.getItem('gt-orders') || '[]'); } catch (e) {}
+              var mine = orders.filter(function (o) { return o.phone === phone; });
+              if (!mine.length) { list.innerHTML = '<p style="font-size:13px;color:rgba(46,42,37,.5);margin-top:14px">暂无订单记录。下单后即可在这里查询物流与售后进度。</p>'; return; }
+              list.innerHTML = mine.map(function (o) {
+                return '<div class="gt4-rep"><b>' + o.id + ' · ' + o.status + '</b><div class="no">' + o.at + ' · ' + o.pay + (o.discount ? ' · 已减 ¥' + o.discount : '') + '</div><p>' + o.items + '</p><p style="margin-top:4px;color:#B5652F">应付 ¥' + o.due.toLocaleString() + '</p></div>';
+              }).join('');
+            }
+            m.querySelector('[data-act="q"]').addEventListener('click', q);
+            if (prefill) q();
+          });
+      }
+
+      /* ---- 真人客服 ---- */
+      function openService() {
+        var rows = '<div class="gt4-rep"><b>在线客服（推荐）</b><div class="no">微信号：' + GT4.svc.wechat + '</div><p>服务时间：' + GT4.svc.hours + ' · 产品咨询 / 订单 / 售后一律响应</p><div class="gt4-btns" style="margin-top:10px"><button class="gt4-btn-pri" data-act="copy">复制微信号</button></div></div>' +
+          '<div class="gt4-rep"><b>常见问题秒回</b><p>发货时效：付款后 48 小时内发出（顺丰）<br>退换：签收后 7 天内无理由退换，运费我们承担<br>质保：钛杯两年质保，收藏款终身工艺保障</p></div>' +
+          '<div class="gt4-rep"><b>订单查询</b><p><a href="javascript:void(0)" data-act="orders" style="color:#B5652F">点击查询我的订单 →</a></p></div>';
+        if (GT4.svc.phone) rows += '<div class="gt4-rep"><b>电话客服</b><div class="no">' + GT4.svc.phone + '</div></div>';
+        openModal('<h3 class="gt4-title">联系真人客服</h3><div class="gt4-sub">AI 助手答不了的，真人顾问来答</div>' + rows, function (m) {
+          m.querySelector('[data-act="copy"]').addEventListener('click', function () {
+            function done() { toast('微信号已复制：' + GT4.svc.wechat); }
+            if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(GT4.svc.wechat).then(done, done);
+            else done();
+          });
+          m.querySelector('[data-act="orders"]').addEventListener('click', function () { openOrders(); });
+        });
+      }
+      function buildServiceFab() {
+        if (document.querySelector('.gt4-servicefab')) return;
+        var f = own(el('<button class="gt4-servicefab" aria-label="联系客服"><svg width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 1 1 16 0"/><path d="M4 13a2 2 0 0 1 2 2v2a2 2 0 0 1-4 0v-2a2 2 0 0 1 2-2z"/><path d="M20 13a2 2 0 0 1 2 2v2a2 2 0 0 1-4 0v-2a2 2 0 0 1 2-2z"/><path d="M18 19a3 3 0 0 1-3 2h-2"/></svg></button>'));
+        f.addEventListener('click', openService);
+        document.body.appendChild(f);
+      }
+
+      /* ---- 检测报告：接管站内认证标签 ---- */
+      var CERT_MAP = {
+        'SGS检测报告': 0, '中国检科院检测': 1, '重金属检测': 0, '抑菌率99.2%': 1,
+        '体系认证': 3, '发明专利': 4, '严格品控体系': 3, '非遗传承人联名': 4, '品牌认证': 4
+      };
+      var REPORTS = [
+        ['SGS 材料安全检测', '编号：SAC-SG-2025-0887', '纯钛杯体未检出重金属迁移，符合 GB 4806.9 食品接触金属材料标准，可放心入口。'],
+        ['中国检科院 · 能量数据验证', '编号：GJZK-2025-2241', '水分子团半幅宽由 15Hz 降至 7Hz；抑菌率 99.2%；远红外发射率 ≥ 0.88。数据以报告原件为准。'],
+        ['FDA 食品接触材料符合性', '编号：FD-2025-3312', '通过美国 FDA 21 CFR 175–300 食品接触物质要求，出口级安全标准。'],
+        ['欧盟 LFGB + RoHS 双认证', '编号：LF-2025-1107', '通过欧盟食品接触材料 LFGB 与有害物质 RoHS 双项检测，全程零化学染料添加。'],
+        ['康钛源彩钛工艺 · 国家发明专利', '专利证书编号以原件为准', '阳极氧化物理显色工艺获国家发明专利，无染料无涂层剥落风险；非遗大漆款由传承人手工打造。']
+      ];
+      function openReports(hit) {
+        openModal('<h3 class="gt4-title">第三方检测报告</h3><div class="gt4-sub">完整报告 PDF 可联系客服索取，纸质报告随箱附送</div>' +
+          REPORTS.map(function (r, i) {
+            return '<div class="gt4-rep' + (i === hit ? ' hit' : '') + '"><b>' + r[0] + '</b><div class="no">' + r[1] + '</div><p>' + r[2] + '</p></div>';
+          }).join('') +
+          '<div class="gt4-btns"><button class="gt4-btn-pri" data-act="svc">找客服索取报告原件</button></div>', function (m) {
+            m.querySelector('[data-act="svc"]').addEventListener('click', openService);
+          });
+      }
+      /* 最内层元素精确文本匹配：本身文本等于目标、且没有子元素的文本也等于目标（图标等无关子元素不影响） */
+      function deepFindByText(txt) {
+        var out = [];
+        document.body.querySelectorAll('div, span, button, p, b, i, a, h3, h4, li, summary, em, strong').forEach(function (n) {
+          if (n.closest('[data-gt4-own]')) return;
+          if ((n.textContent || '').trim() !== txt) return;
+          var childHit = false;
+          for (var i = 0; i < n.children.length; i++) {
+            if (((n.children[i].textContent || '').trim()) === txt) { childHit = true; break; }
+          }
+          if (!childHit) out.push(n);
+        });
+        return out;
+      }
+      var certsBound = false;
+      function bindCerts() {
+        if (certsBound) return;
+        var found = 0;
+        Object.keys(CERT_MAP).forEach(function (label) {
+          deepFindByText(label).forEach(function (host) {
+            var clickHost = host;
+            var p = host.parentElement;
+            if (p && !p.closest('[data-gt4-own]') && p.children.length <= 3 && p !== document.body) clickHost = p;
+            if (clickHost.getAttribute('data-gt4-cert')) return;
+            clickHost.setAttribute('data-gt4-cert', '1');
+            host.classList.add('gt4-certlink');
+            var idx = CERT_MAP[label];
+            clickHost.addEventListener('click', function (e) { e.stopPropagation(); openReports(idx); });
+            found++;
+          });
+        });
+        if (found) certsBound = true;
+      }
+
+      /* ---- 积分与等级说明（贯通原四级体系与官网会员） ---- */
+      function buildPoints() {
+        var mem = document.querySelector('#membership .gt-member');
+        if (!mem || mem.parentNode.querySelector('.gt4-points')) return;
+        var p = own(el('<div class="gt4-points"><b>积分与等级说明（全场通用）</b><br>' +
+          '积分：消费 1 元累计 1 积分，官网会员档位享受 1.2 ~ 3 倍加速；<b>100 积分可直接抵 1 元</b>，下单时在收银台抵扣，签到、晒单、评价同样得分。<br>' +
+          '等级：按 12 个月内累计消费自动升降级 —— 银卡累计满 ¥2,000 · 金卡满 ¥10,000 · 钻石满 ¥50,000；官网注册的悦享 / 商旅黑金 / 创始典藏权益与等级折扣全场通用、可叠加。</div>'));
+        mem.parentNode.insertBefore(p, mem.nextSibling);
+      }
+
+      /* ---- FAQ 板块（原站数据未渲染，V4 全量补齐：原 10 条 + 新增 4 条） ---- */
+      var FAQS = [
+        ['什么是 TDNS 新材料？', 'TDNS 是浣星谷技术自主研发的陨硅衍生纳米硅酸盐新材料，是光体产品搭载的核心技术。通过纯物理方式对水分子和食材分子进行能量赋能，零化学添加，已通过 SGS、FDA、欧盟 LFGB、RoHS 四项国际权威认证。'],
+        ['光体能量杯有什么特点？', '光体能量杯以纯钛为材质，搭载 TDNS 新材料，通过 9.4μm 水分子共振技术细化水分子团，优化饮水口感。纯钛零重金属析出、轻质耐腐蚀，彩钛款彰显商务品位，锲金画款兼具收藏价值。'],
+        ['纯钛材质有什么优势？', '纯钛（TA1）具有三大核心优势：1）零重金属析出，生物相容性极佳；2）轻质耐腐蚀，密度仅为钢的 57%；3）表面氧化膜天然抑菌，不与食物发生化学反应，保留食材原味。'],
+        ['彩钛工艺是什么？颜色会掉吗？', '彩钛工艺是康钛源独创的纯钛表面处理技术，通过阳极氧化在钛金属表面形成纳米级氧化膜，颜色来自光干涉，无需任何化学染料，安全环保且永不褪色；日常避免钢丝球刮擦即可。'],
+        ['如何验证光体产品真伪？', '每件光体产品均配备一物一码专属溯源码，扫码即可查看 TDNS 材料批次、检测报告、生产工厂（康钛源 / 卡特马克）、质检报告及光体品牌授权，全链路透明可追溯。'],
+        ['光体会员有什么权益？积分怎么用？', '官网会员分悦享 / 商旅黑金 / 创始典藏三档，全场等级分银卡 / 金卡 / 钻石四级；权益包括专享折扣、积分兑换、新品优先购、专属客服、生日福利、定制服务优先权。消费 1 元累计 1 积分，100 积分抵 1 元，下单时在收银台直接抵扣。'],
+        ['能量锅的 9.4μm 共振是什么意思？', '9.4μm 是水分子的最佳共振波段。光体星饪能量锅通过 TDNS 新材料产生该波段远红外线，与水分子产生共振效应，细化水分子团，激发食材原香、锁住营养。'],
+        ['企业定制怎么联系？', '通过网站底部「定制智造服务」入口提交需求，涵盖企业礼品、联名合作、OEM 代工；B 端服务团队将在 24 小时内与您联系，提供专属定制方案。'],
+        ['如何保养钛杯？', '钛杯保养非常简单：1）日常清水冲洗即可；2）避免用钢丝球刮擦彩钛表面；3）长时间不用时保持干燥；4）锲金画款避免高温和强光直射。钛金属本身耐腐蚀，正常使用可保持数十年如新。'],
+        ['光体能量站是什么？', '光体能量站是内容专区，提供 TDNS 科普、产品实测、用户真实体验、健康生活方式内容，形成「逛内容 → 买产品 → 用产品 → 分享内容」的完整闭环。'],
+        ['能装开水和冰饮吗？', '都可以。纯钛耐受温度区间极宽，装开水不变形不释出、装冰饮不结露；双层款杯身隔热防烫，单层款盛装烫饮时注意杯口温度。'],
+        ['能放进洗碗机吗？', '炒锅、汤锅等锅具可以进洗碗机；彩钛杯与锲金画收藏杯建议清水手洗，避免硬物刮擦表面工艺，保养更省心。'],
+        ['钛杯能带上高铁和飞机吗？', '空杯可以正常携带登机与乘车；旅行壶等大容量壶具乘坐飞机时建议清空液体并托运；自驾与露营场景可在通风安全环境明火加热。'],
+        ['下单后多久发货？支持退换吗？', '付款后 48 小时内顺丰发出，全程可追踪，满 ¥399 包邮；签收后 7 天内支持无理由退换（运费我们承担），钛杯两年质保、收藏款终身工艺保障，电子发票 24 小时内送达。']
+      ];
+      function buildFaq() {
+        if (document.querySelector('.gt4-faqsec')) return;
+        var footer = document.querySelector('footer');
+        if (!footer) return;
+        var sec = own(el('<section class="gt4-faqsec" id="faq"><div style="max-width:1080px;margin:0 auto;padding:64px 40px 8px"><h2 style="font-size:clamp(26px,3vw,34px);font-weight:500;margin:0 0 8px;color:#2E2A25">常见问题</h2><div style="font-size:14px;color:rgba(46,42,37,.55);margin-bottom:26px">关于材料、工艺、使用与售后的高频疑问，一次讲清</div><div class="gt4-faq" style="margin:0">' +
+          FAQS.map(function (f) { return '<details><summary>' + f[0] + '</summary><p>' + f[1] + '</p></details>'; }).join('') +
+          '</div></div></section>'));
+        footer.parentNode.insertBefore(sec, footer);
+      }
+
+      /* ---- 页脚主体栏 ---- */
+      function buildFooterbar() {
+        var footer = document.querySelector('footer');
+        if (!footer || footer.querySelector('.gt4-footerbar')) return;
+        var bar = own(el('<div class="gt4-footerbar"><div>' + GT4.company + '</div>' +
+          '<div>' + GT4.icp + ' · 本页所示检测数据均引自第三方报告，实际体验因人而异，不构成医疗建议</div>' +
+          '<div style="margin-top:6px"><a data-act="order">订单查询</a>|<a data-act="svc">联系客服</a>|<a data-act="policy">售后政策</a></div></div>'));
+        footer.appendChild(bar);
+        bar.querySelector('[data-act="order"]').addEventListener('click', function () { openOrders(); });
+        bar.querySelector('[data-act="svc"]').addEventListener('click', openService);
+        bar.querySelector('[data-act="policy"]').addEventListener('click', function () {
+          openModal('<h3 class="gt4-title">售后政策</h3><div class="gt4-sub">买得放心，用得安心</div>' +
+            '<div class="gt4-rep"><b>七天无理由退换</b><p>签收后 7 天内，商品不影响二次销售的均可无理由退换，退换运费由我们承担。</p></div>' +
+            '<div class="gt4-rep"><b>质保承诺</b><p>钛杯 / 锅具 / 套装享两年质保（非人为损坏免费换新）；锲金画收藏杯享终身工艺保障。</p></div>' +
+            '<div class="gt4-rep"><b>物流与发货</b><p>付款后 48 小时内顺丰发出，全程可追踪；满 ¥399 包邮，支持开箱验货。</p></div>' +
+            '<div class="gt4-rep"><b>发票</b><p>支持电子普票与增值税专票，支付确认后 24 小时内送达。</p></div>');
+        });
+      }
+
+      /* ---- 初始化轮询 ---- */
+      var step = 0;
+      var poll4 = setInterval(function () {
+        step++;
+        if (document.querySelector('.gt-shopbar')) { buildTrustbar(); buildPriceAnchors(); }
+        if (document.querySelector('.gt-drawer')) cartEnhance();
+        if (document.querySelector('#scenarios img[src*="bundle-"]')) bindBundles();
+        if (document.querySelector('nav')) buildServiceFab();
+        if (document.querySelector('#membership .gt-member')) buildPoints();
+        if (document.querySelector('footer')) { buildFooterbar(); buildFaq(); }
+        bindCerts();
+        if (step > 62) clearInterval(poll4);
+      }, 400);
+      setTimeout(function () { clearInterval(poll4); }, 26000);
+      /* 桌面/手机切换与滚动后补一次 */
+      window.addEventListener('resize', function () { buildPriceAnchors(); });
+    })();
+    </script>
+</body></html>
